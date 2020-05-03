@@ -37,12 +37,19 @@ def get_exif(filename):
  
 if __name__ == '__main__':
 
-  # initialize variables
-  manip_photo_dir = '/Users/egan/Desktop/coding/everyday_egan/manipulated_photos'
-  heif_file = '/Users/egan/Desktop/coding/everyday_egan/original_photos/IMG_7807.heic'
+  # Standard library imports
+  from configparser import ConfigParser
 
-  res = convert_heif_to_bytes(heif_file)
-  # convert_heif_to_bytes(heif_file, manip_photo_dir)
+  # set up configration and initialize variables
+  config = ConfigParser()
+  config.read('../config.ini')
+
+  manip_photo_dir = config['Paths']['manipulated_dir']
+  # heif_file = path.join(config['Paths']['original_dir'], 'IMG_7807.heic')
+  heif_file = path.join(config['Paths']['original_dir'], 'IMG_7809.heic')
+
+  # res_1 = convert_heif_to_bytes(heif_file)
+  res_2 = convert_heif_to_jpeg(heif_file, manip_photo_dir)
 
   breakpoint()
 

@@ -18,9 +18,17 @@ def FAN_implementation(byte_input):
 
 
 if __name__ == '__main__':
+  
+  # Standard library imports
+  from configparser import ConfigParser
+
   # Local library imports
   from heif_interpreter import *
 
-  heif_file_path = '/Users/egan/Desktop/coding/everyday_egan/original_photos/IMG_7807.heic'
-  byte_input = convert_heif_to_bytes(heif_file_path)
+  # setup configuration and initialize variables
+  config = ConfigParser()
+  config.read('../../config.ini')
+
+  heif_file = config['Paths']['original_dir'] + 'IMG_7807.heic'
+  byte_input = convert_heif_to_bytes(heif_file)
 
