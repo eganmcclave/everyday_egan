@@ -10,14 +10,13 @@ import glob
 import PIL
 
 # Local library imports
-from HOG_implementation.facial_detection import *
 
 
-def write_to_video(manip_photo_dir):
+def write_to_video(jpeg_photo_dir, video_name='video', framerate=5):
   (
     ffmpeg
-    .input(os.path.join(manip_photo_dir, '*.jpeg'), pattern_type='glob', framerate=5)
-    .output('movie.mp4')
+    .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=framerate)
+    .output('{}.mp4'.format(video_name))
     .run()
   )
 
@@ -50,6 +49,9 @@ if __name__ == '__main__':
   
   # Standard library imports
   from configparser import ConfigParser
+
+  # Third pary library imports
+  from HOG_implementation.facial_detection import *
 
   # set up configuration and initialize variables
   config = ConfigParser()
