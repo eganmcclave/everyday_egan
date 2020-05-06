@@ -9,6 +9,8 @@ import numpy
 import glob
 import PIL
 
+from tqdm import tqdm
+
 # Local library imports
 
 

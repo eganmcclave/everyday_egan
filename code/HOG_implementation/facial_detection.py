@@ -16,13 +16,14 @@ from tqdm import tqdm
 # Local library imports
 
 
-def jpeg_facial_detection(predictor_path, jpeg_faces_path, draw_bool=False, width=5, radius=3):
+def jpeg_facial_detection(predictor_path, jpeg_faces_path, draw_bool=False, save_bool=False, 
+    width=5, radius=3):
+
   predictor = dlib.shape_predictor(predictor_path)
   detector = dlib.get_frontal_face_detector()
   faces_dict = {}
 
   pbar = tqdm(glob.glob(os.path.join(jpeg_faces_path, '*.jpeg')))
-  # pbar = tqdm([os.path.join(jpeg_faces_path, 'IMG_8473.jpeg')])
   for file_path in pbar:
     file_name = os.path.split(file_path)[1]
     pbar.set_description('Detecting faces in {}'.format(file_name))
@@ -36,8 +37,9 @@ def jpeg_facial_detection(predictor_path, jpeg_faces_path, draw_bool=False, widt
       PIL_img = draw_face_detection(PIL_img, face_dict, width, radius)
       PIL_img.save(file_path)
 
-  with open('face_details.json', 'w') as f:
-    json.dump(faces_dict, f)
+  if save_bool:
+    with open('face_details.json', 'w') as f:
+      json.dump(faces_dict, f)
 
   return faces_dict
 
@@ -48,7 +50,6 @@ def single_facial_detection(img_rgb, file_path, detector, predictor):
 
   if len(dets) != 1:
     print("WARNING - {} is detected to have more than 1 face: {} faces!".format(file_path, len(dets)))
-  #  raise ValueError("{file_path!r} detects more than 1 face".format(file_path))
 
   for i, d in enumerate(dets):
     if d.right() - d.left() > 200:
