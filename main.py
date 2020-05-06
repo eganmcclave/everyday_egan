@@ -78,7 +78,7 @@ if heif_photo_dir is not None:
 if faces_dict is None:
   print("FACIAL DETECTION")
   # perform facial detection with HOG based filtering
-  faces_dict = jpeg_facial_detection(predictor_path, manip_photo_dir, draw_bool=draw_bool, save_bool=save_bool)
+  faces_dict = batch_facial_detection(predictor_path, manip_photo_dir, draw_bool=draw_bool, save_bool=save_bool)
 
 if crop_bool and faces_dict is not None:
   print("IMAGE CROPPING")

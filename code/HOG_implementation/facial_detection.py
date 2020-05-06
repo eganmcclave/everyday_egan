@@ -14,22 +14,25 @@ from PIL import ImageDraw
 from tqdm import tqdm
 
 # Local library imports
+from heif_interpreter import convert_heif_to_bytes
 
 
-def jpeg_facial_detection(predictor_path, jpeg_faces_path, draw_bool=False, save_bool=False, 
+def batch_facial_detection(predictor_path, faces_path, draw_bool=False, save_bool=False, 
     width=5, radius=3):
 
   predictor = dlib.shape_predictor(predictor_path)
   detector = dlib.get_frontal_face_detector()
   faces_dict = {}
 
-  pbar = tqdm(glob.glob(os.path.join(jpeg_faces_path, '*.jpeg')))
+  jpeg_list = glob.glob(os.path.join(faces_path, '*.jpeg'))
+  heic_list = glob.glob(os.path.join(faces_path, '*.heic'))
+
+  pbar = tqdm(jpeg_list + heic_list)
   for file_path in pbar:
     file_name = os.path.split(file_path)[1]
     pbar.set_description('Detecting faces in {}'.format(file_name))
 
-    PIL_img = PIL.Image.open(file_path)
-    img_rgb = np.array(PIL_img)
+    PIL_img, img_rgb = image_handler(file_path)
     face_dict = single_facial_detection(img_rgb, file_path, detector, predictor)
     faces_dict[file_name] = face_dict
 
@@ -42,6 +45,17 @@ def jpeg_facial_detection(predictor_path, jpeg_faces_path, draw_bool=False, save
       json.dump(faces_dict, f)
 
   return faces_dict
+
+
+def image_handler(file_path):
+  if os.path.splitext(file_path)[1] == '.heic':
+    PIL_img = convert_heif_to_bytes
+  else:
+    PIL_img = PIL.Image.open(file_path)
+  img_rgb = np.array(PIL_img)
+
+  return PIL_img, img_rgb
+
 
 def single_facial_detection(img_rgb, file_path, detector, predictor):
 
