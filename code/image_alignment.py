@@ -62,7 +62,7 @@ if __name__ == '__main__':
   predictor_path = config['Paths']['HOG_predictor_path']
   manip_photo_dir = config['Paths']['manipulated_dir']
   
-  faces_dict = jpeg_facial_detection(predictor_path, manip_photo_dir, draw_bool=False, save_bool=False)
+  faces_dict = batch_facial_detection(predictor_path, manip_photo_dir, draw_bool=False, save_bool=False)
   jpeg_crop_images(manip_photo_dir, faces_dict)
   write_to_video(manip_photo_dir)
 
