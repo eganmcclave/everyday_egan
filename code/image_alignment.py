@@ -11,38 +11,76 @@ import PIL
 
 from tqdm import tqdm
 
-# Local library imports
-
 
 def write_to_video(jpeg_photo_dir, video_name='video', framerate=5):
-  (
-    ffmpeg
-    .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=framerate)
-    .output('{}.mp4'.format(video_name))
-    .run()
-  )
+  """ Compiles videos from a directory of .jpeg files
+
+  :param jpeg_photo_dir: A string referencing a valid directory containing 
+  .jpeg images.
+  :param video_name: A string that'll become the name of the .mp4 file.
+  :param framerate: An integer to depict the number of image frames per second.
+  :return: None
+  """
+
+  # wrap to catch file errors
+  try:
+    # grab all existing .jpeg files in provided directory and compile to video
+    (
+      ffmpeg
+      .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=framerate)
+      .output('{}.mp4'.format(video_name))
+      .run()
+    )
+  except IOError as err:
+    print(err)
 
 
 def jpeg_crop_images(jpeg_faces_path, faces_dict):
+  """ Coordinates the cropping of images in a directory
+
+  :param jpeg_faces_path: A valid path to a directory of .jpeg images.
+  :param faces_dict: A dictionary of image name & facial landmarks.
+  :return: None
+  """
+
+  # grabs all .jpeg files from the provided directory and wraps with tqdm
   pbar = tqdm(glob.glob(os.path.join(jpeg_faces_path, '*.jpeg')))
   for file_path in pbar:
+    # writing custom progress bar description for visualization purposes
     file_name = os.path.split(file_path)[1]
     pbar.set_description('Cropping {}'.format(file_name))
 
-    img = PIL.Image.open(file_path)
-    face_dict = faces_dict[file_name] 
+    # wrap to catch file errors
+    try:
+      # read in .jpeg file and its corresponding facial landmarks
+      img = PIL.Image.open(file_path)
+      face_dict = faces_dict[file_name] 
 
-    img = crop_image(img, face_dict)
-    img.save(file_path)
+      # utilize helper function to crop the given .jpeg image
+      img = crop_image(img, face_dict)
+      img.save(file_path)
+    except IOError as err:
+      print(err)
 
 
 def crop_image(image, face_dict, box_size=2000):
+  """ Crops a PIL object based on facial landmarks detected from the image
+
+  :param image: A PIL object of an image.
+  :param face_dict: A dictionary of facial landmarks detected from an image.
+  :param box_size: An integer depicting the size of the bounding box around
+  the facial landmarks.
+  """
+
+  # calculate a bounding box based on the facial landmark detected on the top
+  # of the bridge of the nose
   point = face_dict[0]['facial_points'][27]
   coords = (
     point[0] - 0.50 * box_size, point[1] - 0.35 * box_size,
     point[0] + 0.50 * box_size, point[1] + 0.65 * box_size
   )
 
+  # with the given coordinates crop the image
   image = image.crop(coords)
   return image
 

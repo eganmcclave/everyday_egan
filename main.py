@@ -1,5 +1,6 @@
 
 # Standard library imports
+import argparse 
 import json
 import os
 
@@ -7,7 +8,6 @@ from datetime import date
 from configparser import ConfigParser
 
 # Third party library imports
-import argparse 
 
 # Local library imports
 from code.heif_interpreter import *
