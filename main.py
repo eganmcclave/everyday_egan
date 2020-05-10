@@ -90,6 +90,6 @@ elif crop_bool and faces_dict is None:
 if video_bool:
   print("VIDEO COMPILING")
   # compile images from given directory into a video
-  write_to_video(manip_photo_dir, video_name=video_name, framerate=framerate)
-
+  video_path = write_to_video(manip_photo_dir, video_name=video_name, framerate=framerate)
+  print(video_path)
 

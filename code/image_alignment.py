@@ -24,13 +24,16 @@ def write_to_video(jpeg_photo_dir, video_name='video', framerate=5):
 
   # wrap to catch file errors
   try:
+    video_path = '{}.mp4'.format(video_name)
+
     # grab all existing .jpeg files in provided directory and compile to video
     (
       ffmpeg
       .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=framerate)
-      .output('{}.mp4'.format(video_name))
+      .output(video_path)
       .run()
     )
+    return video_path 
   except IOError as err:
     print(err)
 
