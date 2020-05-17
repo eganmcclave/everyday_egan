@@ -1,0 +1,10 @@
+
+# Don't track content of these folders 
+photos/
+**/__pycache__
+
+# compiled sources
+*.txt
+*.ini
+*.swp
+.DS_store
