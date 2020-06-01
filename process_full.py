@@ -65,4 +65,10 @@ manip_photo_dir = config['Paths']['manipulated_dir']
 # perform facial detection with HOG based filtering
 faces_dict = batch_facial_detection(predictor_path, manip_photo_dir, draw_bool, save_bool)
 
+if crop_bool:
+  jpeg_crop_images(manip_photo_dir, faces_dict)
+
+if video_bool:
+  video_path = write_to_video(manip_photo_dir, video_name=video_name, framerate=framerate)
+
 
