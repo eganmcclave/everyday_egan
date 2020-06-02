@@ -88,6 +88,39 @@ def crop_image(image, face_dict, box_size=2000):
   return image
 
 
+def crop_image_from_file(file_path, face_dict, box_size=2000):
+    """ Crops an image from the given file path based on facial landmarks. This
+    function also saves the cropped image to the input file path.
+
+    :param file_path: A string to a .jpeg file
+    :param face_dict: A dict containing the detected facial coordinates
+    :box_size: An integer depicting the size of the cropped image
+
+    :return: A PIL object of the input file
+    """
+
+    if '.jpeg' not in file_path:
+        raise ValueError("{file_path!r} is not a valid image".format())
+
+    # wrap to catch file errors
+    try:
+        file_name = os.path.split(file_path)[1]
+        img = PIL.Image.open(file_path)
+
+        x_coord, y_coord = face_dict[0]['facial_points'][27][0:1]
+        coords = (
+            x_coord - 0.50 * box_size, y_coord - 0.35 * box_size,
+            x_coord + 0.50 * box_size, y_coord + 0.35 * box_size
+        )
+
+        img = img.crop(coords)
+        img.save(file_path)
+
+        return img
+    except IOError as err:
+        print(err)
+
+
 if __name__ == '__main__':
   
   # Standard library imports
