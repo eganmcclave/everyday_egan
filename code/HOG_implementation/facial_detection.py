@@ -89,7 +89,7 @@ def image_handler(file_path):
   # wrap to catch file errors
   try:
     if os.path.splitext(file_path)[1] == '.heic':
-      PIL_img = convert_heif_to_bytes
+      PIL_img = convert_heif_to_bytes(file_path)
     else:
       PIL_img = PIL.Image.open(file_path)
     img_rgb = np.array(PIL_img)
