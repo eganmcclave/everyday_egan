@@ -10,7 +10,7 @@ from PIL import Image
 from tqdm import tqdm
 
 
-def convert_heif_to_bytes(heif_file_path):
+def convert_heif_to_PIL(heif_file_path):
   """ Converts a .heif/.heic image file into a PIL object
 
   :param heif_file_path: A string which leads to a valid .heif/.heic file.

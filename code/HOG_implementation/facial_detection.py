@@ -54,7 +54,6 @@ def batch_facial_detection(predictor_path, faces_path, draw_bool=False,
       # writing custom progress bar description for visualization purposes
       file_name = os.path.split(file_path)[1]
       pbar.set_description('Detecting faces in {}'.format(file_name))
-
       # utilize helper function to read in file regardless of type
       PIL_img, img_rgb = image_handler(file_path)
 
@@ -99,11 +98,10 @@ def image_handler(file_path):
     print(err)
 
 
-def single_facial_detection(img_rgb, file_path, detector, predictor):
+def single_facial_detection(img_rgb, detector, predictor):
   """ Applies facial detection to a numpy array and returns the coordinates
 
   :param img_rgb: A numpy array object containing RGB values of an image
-  :param file_path: A file path to the image being detected
   :param detector: A dlib object used for detecting facial bounding box
   :param predictor: A dlib object used for predicting facial landmarks
   """
@@ -112,8 +110,8 @@ def single_facial_detection(img_rgb, file_path, detector, predictor):
   face_dict = {}
   dets = detector(img_rgb, 1)
 
-  if len(dets) != 1:
-    print("WARNING - {} is detected to have more than 1 face: {} faces!".format(file_path, len(dets)))
+  #if len(dets) != 1:
+  # print("WARNING - {} is detected to have more than 1 face: {} faces!".format(file_path, len(dets)))
 
   # Iterates through the detected faces
   for i, d in enumerate(dets):
@@ -130,6 +128,29 @@ def single_facial_detection(img_rgb, file_path, detector, predictor):
     print('The passable detections are actually just {}'.format(len(face_dict.keys())))
 
   return face_dict
+
+
+def facial_detection_PIL(PIL_img, detector, predictor):
+    # initialize variables for facial detection
+    face_dict = {}
+    rgb_img = np.array(PIL_img)
+
+    # calculated the faces from the input image
+    dets = detector(rgb_img, 1)
+
+    # Iterates through the detected faces
+    for i, d in enumerate(dets):
+        if d.right() - d.left() > 200:
+            shape = predictor(rgb_img, d)
+            face_dict[i] = {
+                    'facial_coords': [d.left(), d.top(), d.right(), d.bottom()],
+                    'facial_points': [(shape.part(i).x, shape.part(i).y) for i in range(shape.num_parts)]
+            }
+
+    if len(dets) != 1:
+        print("There multiple detections have been narrowed down to {}".format(len(face_dict)))
+
+    return face_dict
 
 
 def draw_face_detection(img, face_dicts, width, radius):
@@ -203,6 +224,16 @@ def draw_facial_coords_2(img, point_coords, width, box_size=2000):
   draw_obj = ImageDraw.Draw(img)
   draw_obj.rectangle(rect_coords, outline='#0000FF', width=width)
   return img
+
+
+def set_up(predictor_path, detector_path):
+    try:
+        predictor = dlib.shape_predictor(predictor_path)
+        detector = dlib.get_frontal_face_detector()
+
+        return predictor, detector
+    except IOError as err:
+        print(err)
 
 
 if __name__ == '__main__':
