@@ -42,5 +42,9 @@ ORIGINAL_DIR = config['Paths']['original_dir']
 MANIPULATED_DIR = config['Paths']['manipulated_dir']
 PREDICTOR_PATH = config['Paths']['HOG_predictor_path']
 
-face_detections = process_all_images(ORIGINAL_DIR, MANIPULATED_DIR, PREDICTOR_PATH, VIDEO_PATH, FRAME_RATE)
+face_detections = process_all_images(ORIGINAL_DIR, MANIPULATED_DIR, PREDICTOR_PATH, 
+        VIDEO_PATH, FRAME_RATE, DRAW, CROP)
+
+if SAVE:
+    pass
 

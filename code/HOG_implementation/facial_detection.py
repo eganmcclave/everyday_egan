@@ -156,10 +156,10 @@ def facial_detection_PIL(PIL_img, predictor, detector):
     return face_dict
 
 
-def draw_face_detection(img, face_dicts, width, radius):
+def draw_face_detection(PIL_img, face_dicts, width=3, radius=5):
   """ Orchestrates all the indivdual drawing functions
 
-  :param img: A PIL object of the input image
+  :param PIL_img: A PIL object of the input image
   :param face_dicts: A dictionary of detected faces in input image
   :param width: An integer depicting the width of line drawn
   :param radius: An integer depicting the radius of circles drawn
@@ -167,49 +167,49 @@ def draw_face_detection(img, face_dicts, width, radius):
 
   # iterate through the detected faces
   for face_dict in face_dicts.values():
-    img = draw_facial_coords(img, face_dict['facial_coords'], width)
-    img = draw_facial_points(img, face_dict['facial_points'], width, radius)
-    img = draw_facial_coords_2(img, face_dict['facial_points'], width)
+    PIL_img = draw_facial_coords(PIL_img, face_dict['facial_coords'], width)
+    PIL_img = draw_facial_points(PIL_img, face_dict['facial_points'], width, radius)
+    PIL_img = draw_facial_coords_2(PIL_img, face_dict['facial_points'], width)
 
-  return img 
+  return PIL_img 
 
 
-def draw_facial_coords(img, rect_coords, width):
+def draw_facial_coords(PIL_img, rect_coords, width=3):
   """ Draws the dlib detected bounding box
 
-  :param img: A PIL object of the input image
+  :param PIL_img: A PIL object of the input image
   :param rect_coords: A list of coordinates making a bounding box
   :param width: An integer depicting the width of line drawn
   """
 
-  draw_obj = ImageDraw.Draw(img)
+  draw_obj = ImageDraw.Draw(PIL_img)
   draw_obj.rectangle(rect_coords, outline='#00FF00', width=width)
-  return img
+  return PIL_img
 
 
-def draw_facial_points(img, point_coords, width, radius):
+def draw_facial_points(PIL_img, point_coords, width=3, radius=5):
   """ Draws the dlib detected 68 facial landmarks
 
-  :param img: A PIL object of the input image
+  :param PIL_img: A PIL object of the input image
   :param point_coords: A list of (x,y) coordinates for points on the image
   :param width: An integer depicting the width of line drawn
   :param radius: An integer depicting the radius of circles drawn
   """
   
   # iterate through all 68 tuples and draw them on the image
-  draw_obj = ImageDraw.Draw(img)
+  draw_obj = ImageDraw.Draw(PIL_img)
   for x, y in point_coords:
     draw_obj.ellipse(
         xy=[x-radius, y-radius, x+radius, y+radius], 
         fill='#00FF00', width=width
     )
-  return img
+  return PIL_img
 
 
-def draw_facial_coords_2(img, point_coords, width, box_size=2000):
+def draw_facial_coords_2(PIL_img, point_coords, width=3, box_size=2000):
   """ Draws the custom bounding box based on facial landmarks
 
-  :param img: A PIL object of the input image
+  :param PIL_img: A PIL object of the input image
   :param point_coords: A list of (x,y) coordinates for points on the image
   :param width: An integer depicting the width of line drawn
   :param box_size: An integer depicting the size of the bounding box around
@@ -224,9 +224,9 @@ def draw_facial_coords_2(img, point_coords, width, box_size=2000):
     point[0] + 0.50 * box_size, point[1] + 0.65 * box_size
   ]
 
-  draw_obj = ImageDraw.Draw(img)
+  draw_obj = ImageDraw.Draw(PIL_img)
   draw_obj.rectangle(rect_coords, outline='#0000FF', width=width)
-  return img
+  return PIL_img
 
 
 def set_up(predictor_path):

@@ -126,7 +126,7 @@ def crop_image_from_PIL(PIL_img, face_dict, box_size=2000):
     try:
         x_coord, y_coord = face_dict[0]['facial_points'][27]
         coords = (
-            x_coord - 0.50 * box_size, y_coord - 0.35 * box_size,
+            x_coord - 0.50 * box_size, y_coord - 0.65 * box_size,
             x_coord + 0.50 * box_size, y_coord + 0.65 * box_size
         )
         PIL_img = PIL_img.crop(coords)
