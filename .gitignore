@@ -2,6 +2,7 @@
 # Don't track content of these folders 
 photos/
 **/__pycache__
+videos/
 
 # compiled sources
 *.dat
