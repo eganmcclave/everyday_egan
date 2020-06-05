@@ -10,7 +10,7 @@ from configparser import ConfigParser
 # Third party library imports
 
 # Local library imports
-from code.heif_interpreter import *
+from code.input_interpreter import *
 from code.HOG_implementation.facial_detection import *
 from code.image_alignment import jpeg_crop_images, write_to_video
 

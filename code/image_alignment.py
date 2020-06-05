@@ -12,24 +12,24 @@ import PIL
 from tqdm import tqdm
 
 
-def write_to_video(jpeg_photo_dir, video_name='video', framerate=5):
+def write_to_video(jpeg_photo_dir, video_name='video', frame_rate=5):
   """ Compiles videos from a directory of .jpeg files
 
   :param jpeg_photo_dir: A string referencing a valid directory containing 
   .jpeg images.
   :param video_name: A string that'll become the name of the .mp4 file.
-  :param framerate: An integer to depict the number of image frames per second.
+  :param frame_rate: An integer to depict the number of image frames per second.
   :return: None
   """
 
   # wrap to catch file errors
   try:
-    video_path = '{}.mp4'.format(video_name)
+    video_path = '{}.mp4'.format(video_name) if '.mp4' not in video_name else video_name
 
     # grab all existing .jpeg files in provided directory and compile to video
     (
       ffmpeg
-      .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=framerate)
+      .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=frame_rate)
       .output(video_path)
       .run()
     )
@@ -107,10 +107,10 @@ def crop_image_from_file(file_path, face_dict, box_size=2000):
         file_name = os.path.split(file_path)[1]
         img = PIL.Image.open(file_path)
 
-        x_coord, y_coord = face_dict[0]['facial_points'][27][0:1]
+        x_coord, y_coord = face_dict[0]['facial_points'][27]
         coords = (
             x_coord - 0.50 * box_size, y_coord - 0.35 * box_size,
-            x_coord + 0.50 * box_size, y_coord + 0.35 * box_size
+            x_coord + 0.50 * box_size, y_coord + 0.65 * box_size
         )
 
         img = img.crop(coords)
@@ -124,10 +124,10 @@ def crop_image_from_file(file_path, face_dict, box_size=2000):
 def crop_image_from_PIL(PIL_img, face_dict, box_size=2000):
     # wrap to catch file errors
     try:
-        x_coord, y_coord = face_dict[0]['facial_points'][27][0:1]
+        x_coord, y_coord = face_dict[0]['facial_points'][27]
         coords = (
             x_coord - 0.50 * box_size, y_coord - 0.35 * box_size,
-            x_coord + 0.50 * box_size, y_coord + 0.35 * box_size
+            x_coord + 0.50 * box_size, y_coord + 0.65 * box_size
         )
         PIL_img = PIL_img.crop(coords)
 

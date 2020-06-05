@@ -13,7 +13,7 @@ from PIL import ImageDraw
 from tqdm import tqdm
 
 # Local library imports
-from ..heif_interpreter import convert_heif_to_bytes
+from ..input_interpreter import convert_heif_to_PIL
 
 
 def batch_facial_detection(predictor_path, faces_path, draw_bool=False, 
@@ -98,12 +98,12 @@ def image_handler(file_path):
     print(err)
 
 
-def single_facial_detection(img_rgb, detector, predictor):
+def single_facial_detection(img_rgb, predictor, detector):
   """ Applies facial detection to a numpy array and returns the coordinates
 
   :param img_rgb: A numpy array object containing RGB values of an image
-  :param detector: A dlib object used for detecting facial bounding box
   :param predictor: A dlib object used for predicting facial landmarks
+  :param detector: A dlib object used for detecting facial bounding box
   """
 
   # calculates the faces from the input image
@@ -130,7 +130,7 @@ def single_facial_detection(img_rgb, detector, predictor):
   return face_dict
 
 
-def facial_detection_PIL(PIL_img, detector, predictor):
+def facial_detection_PIL(PIL_img, predictor, detector):
     # initialize variables for facial detection
     face_dict = {}
     rgb_img = np.array(PIL_img)
@@ -142,13 +142,16 @@ def facial_detection_PIL(PIL_img, detector, predictor):
     for i, d in enumerate(dets):
         if d.right() - d.left() > 200:
             shape = predictor(rgb_img, d)
+            p = shape.part
             face_dict[i] = {
                     'facial_coords': [d.left(), d.top(), d.right(), d.bottom()],
-                    'facial_points': [(shape.part(i).x, shape.part(i).y) for i in range(shape.num_parts)]
+                    'facial_points': [(p(i).x, p(i).y) for i in range(shape.num_parts)]
             }
 
-    if len(dets) != 1:
-        print("There multiple detections have been narrowed down to {}".format(len(face_dict)))
+    if len(dets) != 1 and len(face_dict) > 1:
+        raise ValueError("the latest image file has detected multiple faces")
+    elif len(dets) == 0:
+        raise IOError("the latest image has detected no faces :(")
 
     return face_dict
 
@@ -226,7 +229,7 @@ def draw_facial_coords_2(img, point_coords, width, box_size=2000):
   return img
 
 
-def set_up(predictor_path, detector_path):
+def set_up(predictor_path):
     try:
         predictor = dlib.shape_predictor(predictor_path)
         detector = dlib.get_frontal_face_detector()

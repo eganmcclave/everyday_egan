@@ -4,6 +4,7 @@ photos/
 **/__pycache__
 
 # compiled sources
+*.dat
 *.txt
 *.ini
 *.swp

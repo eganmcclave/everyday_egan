@@ -1,74 +1,46 @@
 
-# Standard library imports
-import argparse 
-import json
+# standard library imports
+import argparse
 import os
 
 from datetime import date
 from configparser import ConfigParser
 
-# Third party library imports
-
-# Local library imports
-from code.HOG_implementation.facial_detection import batch_facial_detection
-from code.image_alignment import jpeg_crop_images, write_to_video
-
-
-def is_valid_file(file_path):
-  try:
-    if not os.path.exists(file_path):
-      msg = "{0!r} is not a valid file path".format(file_path)
-      raise argparse.ArgumentTypeError(msg)
-  except IOError as err:
-    print(err)
-
-  return file_path
+# local library imports
+from code.orchestrator import process_all_images
 
 
 # set up command line argument parser
 ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--file-path", required=True,
-  help="A path to a directory of .heic files",
-  type=lambda x: is_valid_file(x))
-ap.add_argument("-d", "--draw-bool", required=False,
-  help="A boolean for drawing detected faces on images",
-  action="store_true")
-ap.add_argument("-c", "--crop-bool", required=False,
-  help="A boolean for cropping images based on facial detection",
-  action="store_true")
-ap.add_argument("-V", "--video-name", required=False,
-  help="A string for the name of the video (default: video_{}.mp4)".format(date.today()),
-  default="video_{}".format(date.today()))
-ap.add_argument("-R", "--framerate", required=False,
-  help="An integer detailing the number of frames per second in output video",
-  default=10)
-ap.add_argument("-O", "--output-dir", required=False,
-  help="A string for the file directory to output the video to",
-  default="./output")
+ap.add_argument("-s", "--save", required=False, action="store_true",
+    help="A boolean for saving the detected facial landmarks")
+ap.add_argument("-d", "--draw", required=False, action="store_true",
+    help="A boolean for drawing detected faces on images")
+ap.add_argument("-c", "--crop", required=False, action="store_true",
+    help="A boolean for croping images")
+ap.add_argument("-n", "--name", required=False, 
+    default="video_{}".format(date.today()),
+    help="A string for the name of the video")
+ap.add_argument("-r", "--rate", required=False, default=10,
+    help="An integer detailing the number of frames in a video")
+ap.add_argument("-o", "--output", required=False, default="./videos",
+    help="A string for the file directory to output video")
 args = vars(ap.parse_args())
 
-# initialize command line arguments for usage
-photo_file_dir = args['file_path']
-draw_bool = args['draw_bool']
-crop_bool = args['crop_bool']
-framerate = args['framerate']
-video_name = os.path.join(args['output_dir'], str(framerate), args['video_name'])
-
-# set up configuration parser and read existing config file
+# set up configuration parser and read config file
 config = ConfigParser()
-config.read('config.ini')
+config.read("config.ini")
 
-# initialize configuration arguments for usage
-predictor_path = config['Paths']['HOG_predictor_path']
-manip_photo_dir = config['Paths']['manipulated_dir']
+# initialize command line arguments and configuration variables
+SAVE = args['save']
+DRAW = args['draw']
+CROP = args['crop']
+VIDEO_PATH = os.path.join(args['output'], str(args['rate']), args['name'] + '.mp4')
+FRAME_RATE = args['rate']
 
-# perform facial detection with HOG based filtering
-faces_dict = batch_facial_detection(predictor_path, manip_photo_dir, draw_bool, save_bool)
+ORIGINAL_DIR = config['Paths']['original_dir']
+MANIPULATED_DIR = config['Paths']['manipulated_dir']
+PREDICTOR_PATH = config['Paths']['HOG_predictor_path']
 
-if crop_bool:
-  jpeg_crop_images(manip_photo_dir, faces_dict)
-
-if video_bool:
-  video_path = write_to_video(manip_photo_dir, video_name=video_name, framerate=framerate)
-
+face_detections = process_all_images(ORIGINAL_DIR, MANIPULATED_DIR, PREDICTOR_PATH, VIDEO_PATH, FRAME_RATE)
 
