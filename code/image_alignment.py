@@ -122,6 +122,16 @@ def crop_image_from_file(file_path, face_dict, box_size=2000):
 
 
 def crop_image_from_PIL(PIL_img, face_dict, box_size=2000):
+    """ Crops an image from the given PIL object based on facial landmarks. This
+    function also saves the cropped image to the input file path.
+
+    :param PIL_img: A PIL object of a valid image
+    :param face_dict: A dict containing the detected facial coordinates
+    :box_size: An integer depicting the size of the cropped image
+
+    :return: A PIL object of the input file
+    """
+
     # wrap to catch file errors
     try:
         x_coord, y_coord = face_dict[0]['facial_points'][27]

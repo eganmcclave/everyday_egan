@@ -131,6 +131,14 @@ def single_facial_detection(img_rgb, predictor, detector):
 
 
 def facial_detection_PIL(PIL_img, predictor, detector):
+    """ Applies facial detection to a PIL object and returns the coordinates
+    
+    :param PIL_img: A numpy array object containing RGB values of an image
+    :param predictor: A dlib object used for predicting facial landmarks
+    :param detector: A dlib object used for detecting facial bounding box
+    :returnL: A dictionary of facial detection coordiantes
+    """
+
     # initialize variables for facial detection
     face_dict = {}
     rgb_img = np.array(PIL_img)
