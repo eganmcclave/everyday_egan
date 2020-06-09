@@ -1,6 +1,7 @@
 
 # standard library imports
 import argparse
+import json
 import os
 
 from datetime import date
@@ -42,9 +43,12 @@ ORIGINAL_DIR = config['Paths']['original_dir']
 MANIPULATED_DIR = config['Paths']['manipulated_dir']
 PREDICTOR_PATH = config['Paths']['HOG_predictor_path']
 
+# process all images in the input directory
 face_detections = process_all_images(ORIGINAL_DIR, MANIPULATED_DIR, PREDICTOR_PATH, 
         VIDEO_PATH, FRAME_RATE, DRAW, CROP)
 
+# if prompted then save facial detections for later usage
 if SAVE:
-    pass
+    with open('face_data.json', 'w') as fp:
+        json.dump(face_detections, fp)
 

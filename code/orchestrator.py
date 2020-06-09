@@ -14,7 +14,7 @@ from .image_alignment import crop_image_from_PIL, write_to_video
 
 
 def process_all_images(orig_dir, manip_dir, predictor_path, video_path, frame_rate, 
-        draw, crop, box_size=2500):
+        draw, crop, box_size=2500, prev_images=None):
     """ A orchestrator function which coordinates the processing of all images in a 
     given directory and compiles them into a single video.
 
@@ -34,12 +34,17 @@ def process_all_images(orig_dir, manip_dir, predictor_path, video_path, frame_ra
     predictor, detector = set_up(predictor_path)
 
     # set a progress bar to iterate through of the input images
-    pbar = tqdm(sorted(iglob(os.path.join(orig_dir, "*.*")), key=os.path.getmtime))
-    for orig_fp in pbar:
+    valid_images = iglob(os.path.join(orig_dir, "*.*"))
+    images_pbar = tqdm(sorted(valid_images, key=os.path.getmtime))
+    for orig_fp in images_pbar:
         # parse the file name for custom progress bar description
         file_name = os.path.splitext(os.path.split(orig_fp)[1])[0]
         pbar.set_description("Processing {!r}".format(file_name))
         manip_fp = os.path.join(manip_dir, file_name + ".jpeg")
+
+        # if current input image has already been processed then skip to next iter
+        if prev_images is not None and file_name in prev_images:
+            continue
 
         # process a single image using helper function and save detected faces
         face_detect = process_image_PIL(orig_fp, manip_fp, predictor, detector, draw, crop, box_size)
