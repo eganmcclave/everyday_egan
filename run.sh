@@ -2,6 +2,6 @@
 
 echo "Starting Python Pipeline"
 
-python3 main.py -p "photos/original_photos" -f "code/face_details.json" -c -v
+python3 process_full.py
 
 echo "Pipeline completed"
