@@ -8,16 +8,22 @@ import h5py
 # Local library imports
 
 
-def store_single_hdf5(image, image_id, label, hdf5_dir="./"):
+def store_single_hdf5(dataset_path, np_img, attr_dict=None):
+    """ """
+
     # Interact with HDF5 file with context manager
-    with h5py.File(os.path.join(hdf5_dir, f"{image_id}.h5"), 'a') as f:
-        # Create a dataset in the file
-        dataset = f.create_dataset(
-            "image", np.shape(image), h5py.h5t.STD_U8BE, data=image
-        )
-        meta_set = f.create_dataset(
-            "meta", np.shape(label), h5py.h5t.STD_U8BE, data=label
-        )
+    with h5py.File("face_data.h5", 'a') as f:
+
+        # Create a dataset in the file if it does not exist in the file
+        if dataset_path not in f:
+            dset = f.create_dataset(
+                dataset_path, np.shape(np_img), h5py.h5t.STD_U8BE, data=np_img
+            )
+
+        # Iterate through attribute dictionary and assign any new info
+        for key, value in attr_dict.items():
+            if key not in dset.attrs:
+                dset.attrs[key] = value
 
 
 if __name__ == "__main__":
