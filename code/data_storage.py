@@ -9,7 +9,14 @@ import h5py
 
 
 def store_single_hdf5(dataset_path, np_img, attr_dict=None):
-    """ """
+    """ A helper function which facilitates saving image data and detected 
+    facial landmarks to HDF5 files.
+    
+    :param dataset_path: A string to the path in the HDF5 file.
+    :param np_img: A numpy array of integers representing an image file.
+    :attr_dict: An optional dictionary of attributes associated with the numpy 
+    image. This can contain crop dimensions or facial landmarks.
+    """
 
     # Interact with HDF5 file with context manager
     with h5py.File("face_data.h5", 'a') as f:
