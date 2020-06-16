@@ -10,7 +10,8 @@ from tqdm import tqdm
 # Local library imports
 from .input_interpreter import convert_to_PIL
 from .HOG_implementation.facial_detection import set_up, facial_detection_PIL, draw_facial_points
-from .image_alignment import crop_image_from_PIL, write_to_video
+from .image_alignment import crop_image_from_PIL, write_jpegs_to_video, write_numpy_to_video
+from .data_storage import store_single_hdf5
 
 
 def process_all_images(orig_dir, manip_dir, predictor_path, video_path, frame_rate, 

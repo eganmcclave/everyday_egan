@@ -12,51 +12,67 @@ import PIL
 from tqdm import tqdm
 
 
-def write_to_video(jpeg_photo_dir, video_name='video', frame_rate=5):
-  """ Compiles videos from a directory of .jpeg files
-
-  :param jpeg_photo_dir: A string referencing a valid directory containing 
-  .jpeg images.
-  :param video_name: A string that'll become the name of the .mp4 file.
-  :param frame_rate: An integer to depict the number of image frames per second.
-  :return: None
-  """
-
-  # wrap to catch file errors
-  try:
-    video_path = '{}.mp4'.format(video_name) if '.mp4' not in video_name else video_name
-
-    # grab all existing .jpeg files in provided directory and compile to video
-    (
-      ffmpeg
-      .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=frame_rate)
-      .output(video_path)
-      .run()
-    )
-    return video_path 
-  except IOError as err:
-    print(err)
-
-
-def vidwrite(fn, images, framerate=60, vcodec='libx264'):
-    if not isinstance(images, np.ndarray):
-        images = np.asarray(images)
-    n,height,width,channels = images.shape
-    process = (
-        ffmpeg
-            .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
-            .output(fn, pix_fmt='yuv420p', vcodec=vcodec, r=framerate)
-            .overwrite_output()
-            .run_async(pipe_stdin=True)
-    )
-    for frame in images:
-        process.stdin.write(
-            frame
-                .astype(np.uint8)
-                .tobytes()
+def write_jpegs_to_video(jpeg_photo_dir, video_name='video', frame_rate=5):
+    """ Compiles videos from a directory of .jpeg files
+  
+    :param jpeg_photo_dir: A string referencing a valid directory containing 
+    .jpeg images.
+    :param video_name: A string that'll become the name of the .mp4 file.
+    :param frame_rate: An integer to depict the number of image frames per second.
+    :return: A string to the output video
+    """
+  
+    # wrap to catch file errors
+    try:
+        video_path = '{}.mp4'.format(video_name) if '.mp4' not in video_name else video_name
+    
+        # grab all existing .jpeg files in provided directory and compile to video
+        (
+            ffmpeg
+            .input(os.path.join(jpeg_photo_dir, '*.jpeg'), pattern_type='glob', framerate=frame_rate)
+            .output(video_path)
+            .run()
         )
-    process.stdin.close()
-    process.wait()
+        return video_path 
+    except IOError as err:
+        print(err)
+
+
+def write_numpy_to_video(video_path, img_array, frame_rate=60, vcodec='libx264'):
+    """ Compiles video from a numpy array of images
+
+    :param video_path: A string for the saved video path.
+    :param img_array: A n-d numpy array of integers.
+    :param frame_rate: An integer to represent the number of image frames per second.
+    :param vcodec: A string representing the codec for the video output.
+    :return: A string to the output video
+    """
+
+    try:
+        if not isinstance(img_array, np.ndarray):
+            img_array = np.asarray(img_array)
+        n, height, width, channels = img_array.shape
+        process = (
+            ffmpeg
+                #.input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+                .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+                #.output(video_name, pix_fmt='yuv420p', vcodec=vcodec, r=framerate)
+                .output(video_path, pix_fmt='yuv420p', r=frame_rate)
+                .overwrite_output()
+                .run_async(pipe_stdin=True)
+        )
+        for frame in img_array:
+            process.stdin.write(
+                frame
+                    .astype(np.uint8)
+                    .tobytes()
+            )
+        process.stdin.close()
+        process.wait()
+
+        return video_path
+    except IOError as err:
+        print(err)
 
 
 def jpeg_crop_images(jpeg_faces_path, faces_dict):
