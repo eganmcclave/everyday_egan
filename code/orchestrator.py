@@ -95,6 +95,9 @@ def process_image_PIL(origin_fp, manip_fp, predictor, detector, draw, crop, box_
     if crop:
         PIL_img = crop_image_from_PIL(PIL_img, face_dict, box_size=box_size)
 
+    # store the numpy array in .hdf5
+    store_single_hdf5('temp', PIL_img)
+
     # save the output image
     PIL_img.save(manip_fp) 
 
